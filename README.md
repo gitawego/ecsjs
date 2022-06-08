@@ -1,6 +1,6 @@
 # Entity Component System
 
-It's a demo project to expriment the ECS pattern in  web develpment.
+It's a demo project to experiment the ECS pattern in  web develpment.
 
 demo: https://gitawego.github.io/ecsjs/
 ## note for ECS

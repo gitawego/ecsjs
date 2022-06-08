@@ -110,9 +110,26 @@ export class ToDoListSystem extends System<ToDoWorld, Systems> {
     <button type="button" class="btn btn-outline-secondary completed-btn ${completedClass}" type="submit" data-type="completed">Completed</button>`;
   }
 
+  sortEntities() {
+    return [...this.toDoItemsArchType.entityIds].sort((a, b) => {
+      const entityA = this.world.findEntityById(a);
+      const entityB = this.world.findEntityById(b);
+      const [toDoCompA]: [ToDoItemComponent] = entityA.findComponents([
+        'toDoItem',
+      ]) as any;
+      const [toDoCompB]: [ToDoItemComponent] = entityB.findComponents([
+        'toDoItem',
+      ]) as any;
+      return new Date(toDoCompA.data.createdAt!) >
+        new Date(toDoCompB.data.createdAt!)
+        ? 1
+        : -1;
+    });
+  }
+
   renderToDoItems(todoListComp: ToDoListComponent) {
     const itemsNode = this.getItemsNode(todoListComp.data.container!)!;
-    for (const entityId of this.toDoItemsArchType.entityIds) {
+    for (const entityId of this.sortEntities()) {
       const ent = this.world.findEntityById(entityId);
       if (!ent) {
         continue;

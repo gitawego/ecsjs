@@ -1,0 +1,42 @@
+todo-list {
+  .to-do-list-items {
+    margin-top: 10px;
+    .to-do-list-item {
+      align-items: center;
+      &.checked {
+        text-decoration: line-through;
+      }
+      .to-do-list-content {
+        flex: 1;
+      }
+    }
+  }
+  .to-do-list-action {
+    button {
+      color: gray;
+      border: gray;
+      cursor: default;
+    }
+    &[data-type='all'] {
+      button.all-btn {
+        color: initial;
+        border: initial;
+        cursor: pointer;
+      }
+    }
+    &[data-type='pending'] {
+      button.pending-btn {
+        color: initial;
+        border: initial;
+        cursor: pointer;
+      }
+    }
+    &[data-type='completed'] {
+      button.completed-btn {
+        color: initial;
+        border: initial;
+        cursor: pointer;
+      }
+    }
+  }
+}

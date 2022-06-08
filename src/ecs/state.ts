@@ -1,4 +1,4 @@
-import { get } from 'lodash-es';
+import { get, set } from 'lodash-es';
 
 export type Subscriber<T> = (newState: T, oldState: T) => void;
 export interface Subscribers<T> {
@@ -10,7 +10,7 @@ export function state<T extends object = any>(initialState: Partial<T>) {
   const store = new Proxy(initialState, {
     set(stateVal: T, key: string, value: any) {
       const oldState = { ...stateVal };
-      stateVal[key as keyof T] = value;
+      set(stateVal, key, value);
       subs.forEach(sub => {
         if (get(stateVal, sub.key) !== get(oldState, sub.key)) {
           sub.callback(stateVal, oldState);

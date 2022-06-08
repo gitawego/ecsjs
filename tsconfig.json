@@ -30,7 +30,7 @@
     "preserveSymlinks": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": false,
-    "outDir": "./dist"
+    "outDir": "./output"
   },
   "include": ["src"]
 }

@@ -63,7 +63,7 @@ export class World<
   }
 
   registerComponents(comps: C) {
-    for (const [key, val] of Object.entries(comps)) {
+    for (const val of Object.values(comps)) {
       this.registerComponent(val as ValueOf<C>);
     }
   }
@@ -125,7 +125,7 @@ export class World<
   }
 
   addSystems(sys: S) {
-    for (const [key, val] of Object.entries(sys)) {
+    for (const val of Object.values(sys)) {
       this.addSystem(val as ValueOf<S>);
     }
   }

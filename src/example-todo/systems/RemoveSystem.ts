@@ -16,10 +16,7 @@ export class RemoveSystem extends System<ToDoWorld, Systems> {
     return this.world.options?.screen?.querySelector<HTMLDivElement>(selector);
   }
 
-  async update([todoItemComp, removeComp]: [
-    ToDoItemComponent,
-    RemoveComponent
-  ]) {
+  async update([, removeComp]: [ToDoItemComponent, RemoveComponent]) {
     const entity = this.world.findEntityById(removeComp.entityId);
     if (!entity) {
       return;

@@ -1,5 +1,10 @@
 import { World } from '../ecs/World';
 import { components } from './components';
+import {
+  initStorageEntity,
+  searchFieldEntity,
+  toDoListEntity,
+} from './entities';
 import { systems } from './systems';
 import { Components, Systems, ToDoWorld } from './todo.model';
 
@@ -20,46 +25,9 @@ export class ToDo extends HTMLElement {
       <div class="create-container"></div>
       <div class="todo-list-items"></div>
     </div>`;
-    this.world.addEntity({
-      id: 'initStorage',
-      components: [
-        {
-          componentName: 'initStorage',
-          data: {
-            type: 'local',
-          },
-        },
-      ],
-    });
-    this.world.addEntity({
-      id: 'search-field',
-      components: [
-        {
-          componentName: 'create',
-          data: {
-            nodeSelector: '.create-container',
-          },
-        },
-      ],
-    });
-    this.world.addEntity({
-      id: 'todo-list',
-      components: [
-        {
-          componentName: 'toDoList',
-          data: {
-            renderType: 'all',
-            container: '.todo-list-items',
-          },
-        },
-        {
-          componentName: 'storage',
-          data: {
-            type: 'local',
-          },
-        },
-      ],
-    });
+    initStorageEntity(this.world);
+    searchFieldEntity(this.world);
+    toDoListEntity(this.world);
     void this.world.tick();
   }
 

@@ -1,5 +1,6 @@
 import { System } from '../../ecs/System';
 import { CreateComponent } from '../components/CreateComponent';
+import { toDoItemEntity } from '../entities';
 import { Systems, ToDoWorld } from '../todo.model';
 
 export class CreationSystem extends System<ToDoWorld, Systems> {
@@ -34,24 +35,7 @@ export class CreationSystem extends System<ToDoWorld, Systems> {
             )!.value;
           console.log('val', val);
           if (val) {
-            this.world.addEntity({
-              components: [
-                {
-                  componentName: 'toDoItem',
-                  data: {
-                    content: val,
-                    createdAt: new Date().toISOString(),
-                    status: 'pending',
-                  },
-                },
-                {
-                  componentName: 'storage',
-                  data: {
-                    type: 'local',
-                  },
-                },
-              ],
-            });
+            toDoItemEntity(val, this.world);
             void this.world.tick();
           }
         });

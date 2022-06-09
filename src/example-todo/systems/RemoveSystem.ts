@@ -12,10 +12,6 @@ export class RemoveSystem extends System<ToDoWorld, Systems> {
     });
   }
 
-  container(selector: string) {
-    return this.world.options?.screen?.querySelector<HTMLDivElement>(selector);
-  }
-
   async update([, removeComp]: [ToDoItemComponent, RemoveComponent]) {
     const entity = this.world.findEntityById(removeComp.entityId);
     if (!entity) {

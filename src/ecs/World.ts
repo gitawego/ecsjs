@@ -6,14 +6,13 @@ import { Component } from './Component';
 import { Entity } from './Entity';
 import {
   AddComponentOptions,
-  ECSEventName,
+  ECSEvents,
   EntityOptions,
   RegisteredComponents,
   RegisteredSystems,
   RemoveComponentOptions,
   SystemOptions,
   ValueOf,
-  WorldEvents,
   WorldOptions,
 } from './model';
 import { state } from './state';
@@ -21,13 +20,11 @@ import { buildComponentId, matchTags } from './utils';
 
 const TICKET_ERROR_EVENT = 'tick:error';
 export class World<
-    C extends RegisteredComponents = any,
-    S extends RegisteredSystems<World> = any,
-    State extends object = any
-  >
-  extends EventEmitter<ECSEventName>
-  implements WorldEvents
-{
+  C extends RegisteredComponents = any,
+  S extends RegisteredSystems<World> = any,
+  State extends object = any
+> extends EventEmitter<ECSEvents<World>> {
+  // implements WorldEvents
   systems: Partial<{
     [K in keyof S]: InstanceType<S[K]>;
   }> = {};

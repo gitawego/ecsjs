@@ -124,8 +124,6 @@ export interface AddEntityEvent<W extends World = any> {
   entity: Entity<W>;
 }
 
-export type ECSEventName = keyof ECSEvents;
-
 export interface ECSStorage<T = any> extends EventEmitter<ECSStorageEventName> {
   get(id: string): Promise<T>;
   set(id: string, val: T): Promise<any>;
@@ -140,19 +138,6 @@ export interface WorldOptions {
 export interface WorldStorage {
   entity?: ECSStorage<Required<EntityOptions>>;
   component?: ECSStorage<ComponentStorageData>;
-}
-
-export interface WorldEvents {
-  emit<T extends ECSEventName>(type: T, data: ECSEvents[T]): boolean;
-
-  on<T extends ECSEventName>(type: T, fnc: (data: ECSEvents[T]) => void): this;
-
-  once<T extends ECSEventName>(
-    type: T,
-    fnc: (data: ECSEvents[T]) => void
-  ): this;
-
-  off<T extends ECSEventName>(type: T, fnc: (data: ECSEvents[T]) => void): this;
 }
 
 export interface ComponentStorageData<T = any> {

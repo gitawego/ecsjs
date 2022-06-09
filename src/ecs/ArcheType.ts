@@ -1,5 +1,5 @@
 import EventEmitter from 'eventemitter3';
-import { AddEntityEvent, ECSEventName, RemoveEntityEvent } from './model';
+import { AddEntityEvent, ECSEvents, RemoveEntityEvent } from './model';
 import type { World } from './World';
 
 const StrConstant = {
@@ -8,7 +8,7 @@ const StrConstant = {
 } as const;
 
 export class ArcheType extends EventEmitter<
-  Extract<ECSEventName, 'entity:add' | 'entity:remove'>
+  Pick<ECSEvents, 'entity:add' | 'entity:remove'>
 > {
   entityIds = new Set<string>();
 

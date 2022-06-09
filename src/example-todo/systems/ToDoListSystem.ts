@@ -139,28 +139,12 @@ export class ToDoListSystem extends System<ToDoWorld, Systems> {
       const toDoComp: ToDoItemComponent = comps[0];
       const renderType = todoListComp.data.renderType;
 
-      let node = this.findNodeById(entityId, itemsNode);
+      const node = this.findNodeById(entityId, itemsNode);
       if (renderType !== 'all' && toDoComp.data.status !== renderType) {
         node?.remove();
         continue;
       }
-      const checked = toDoComp.data.status === 'completed' ? 'checked' : '';
-      if (!node) {
-        itemsNode?.insertAdjacentHTML(
-          'beforeend',
-          `<li class="list-group-item d-flex to-do-list-item ${checked}" data-id=${entityId}>
-            <input class="form-check-input me-2" type="checkbox" ${checked}>
-            <span class="to-do-list-content">${toDoComp.data.content}</span>
-            <button type="button" class="btn btn-outline-danger btn-remove-item">Remove</button>
-          </li>`
-        );
-        node = this.findNodeById(entityId, itemsNode);
-      } else {
-        node.classList[checked ? 'add' : 'remove']('checked');
-        node
-          .querySelector('input')!
-          [checked ? 'setAttribute' : 'removeAttribute'](checked, '');
-      }
+      this.renderItem(toDoComp, node, itemsNode, entityId);
     }
     const itemNodes = this.findNodes(itemsNode);
     itemNodes.forEach(item => {
@@ -171,8 +155,35 @@ export class ToDoListSystem extends System<ToDoWorld, Systems> {
     });
   }
 
+  renderItem(
+    toDoComp: ToDoItemComponent,
+    node: HTMLElement | undefined | null,
+    itemsNode: HTMLElement,
+    entityId: string
+  ) {
+    const checked = toDoComp.data.status === 'completed' ? 'checked' : '';
+    if (!node) {
+      itemsNode?.insertAdjacentHTML(
+        'beforeend',
+        `<li class="list-group-item d-flex to-do-list-item ${checked}" data-id=${entityId}>
+            <input class="form-check-input me-2" type="checkbox" ${checked}>
+            <span class="to-do-list-content">${toDoComp.data.content}</span>
+            <button type="button" class="btn btn-outline-danger btn-remove-item">Remove</button>
+          </li>`
+      );
+      node = this.findNodeById(entityId, itemsNode);
+    } else {
+      node.classList[checked ? 'add' : 'remove']('checked');
+      node
+        .querySelector('input')!
+        [checked ? 'setAttribute' : 'removeAttribute'](checked, '');
+    }
+  }
+
   findNodeById(entityId: string, node?: HTMLElement) {
-    return node?.querySelector(`.to-do-list-item[data-id="${entityId}"]`);
+    return node?.querySelector<HTMLElement>(
+      `.to-do-list-item[data-id="${entityId}"]`
+    );
   }
 
   findNodes(node?: HTMLElement) {

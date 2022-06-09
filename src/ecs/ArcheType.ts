@@ -7,14 +7,17 @@ const StrConstant = {
   entityRemove: 'entity:remove',
 } as const;
 
-export class ArcheType extends EventEmitter<
+export class ArcheType<W extends World> extends EventEmitter<
   Pick<ECSEvents, 'entity:add' | 'entity:remove'>
 > {
-  entityIds = new Set<string>();
+  entityIds = new Set<keyof W['entities']>();
 
   events: any[] = [];
 
-  constructor(readonly componentNames: string[], readonly world: World) {
+  constructor(
+    readonly componentNames: (keyof W['components'])[],
+    readonly world: W
+  ) {
     super();
     this.indexeEntities();
     const addEntity = (data: AddEntityEvent) => {

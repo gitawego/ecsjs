@@ -2,7 +2,6 @@ import EventEmitter from 'eventemitter3';
 import * as uuid from 'uuid';
 import { GraphData, tsort } from '../lib/tsort';
 import { ArcheType } from './ArcheType';
-import { Component } from './Component';
 import { Entity } from './Entity';
 import {
   AddComponentOptions,
@@ -21,9 +20,9 @@ import { buildComponentId, matchTags } from './utils';
 const TICKET_ERROR_EVENT = 'tick:error';
 export class World<
   C extends RegisteredComponents = any,
-  S extends RegisteredSystems<World> = any,
+  S extends RegisteredSystems<World<C, S, State>> = any,
   State extends object = any
-> extends EventEmitter<ECSEvents<World>> {
+> extends EventEmitter<ECSEvents<World<C, S, State>>> {
   // implements WorldEvents
   systems: Partial<{
     [K in keyof S]: InstanceType<S[K]>;
@@ -31,23 +30,18 @@ export class World<
 
   components: Partial<C> = {};
 
-  componentInstances: Record<string, Component> = {};
+  componentInstances: Record<string, InstanceType<ValueOf<C>>> = {};
 
-  entities: Record<string, Entity<World<C, S, State>>> = {};
-
-  queryMapping = {
-    id: this.queryEntitiesByIds.bind(this),
-    tag: this.queryEntitiesByTags.bind(this),
-    component: this.queryEntitiesByComponents.bind(this),
-  };
+  entities: Record<string, Entity<this>> = {};
 
   /**
    * global state
    */
-  state = state<State>({});
+  state: ReturnType<typeof state<State>>;
 
-  constructor(readonly options?: WorldOptions) {
+  constructor(readonly options?: WorldOptions<State>) {
     super();
+    this.state = state<State>(this.options?.state);
   }
   /**
    * use archetype to get related entities
@@ -55,7 +49,7 @@ export class World<
    * @returns
    */
 
-  archetype(componentNames: string[]): ArcheType {
+  archetype(componentNames: (keyof C)[]): ArcheType<this> {
     return new ArcheType(componentNames, this);
   }
 
@@ -75,7 +69,7 @@ export class World<
     return this;
   }
 
-  unregisterComponent(name: string) {
+  unregisterComponent(name: keyof this['components']) {
     for (const entity of Object.values(this.entities)) {
       this.removeComponentFromEntity({
         componentName: name,
@@ -91,22 +85,24 @@ export class World<
   >(opt: AddComponentOptions<EO, EK>) {
     const Comp = this.components[opt.componentName];
     if (!Comp) {
-      throw new Error(`World: component ${opt.componentName} not found`);
+      throw new Error(
+        `World: component ${String(opt.componentName)} not found`
+      );
     }
     const inst = new Comp!(opt, this);
     if (opt.importData) {
       inst.importData(opt.data);
     }
-    this.componentInstances[inst.id] = inst;
+    this.componentInstances[inst.id] = inst as InstanceType<ValueOf<C>>;
     this.emit('component:add', opt);
     return this;
   }
 
-  getComponent<T extends typeof Component>(name: string): T {
-    return this.components[name] as any;
+  getComponent(name: keyof this['components']) {
+    return this.components[name];
   }
 
-  removeComponentFromEntity(opt: RemoveComponentOptions) {
+  removeComponentFromEntity(opt: RemoveComponentOptions<this>) {
     const id =
       opt.componentId ||
       buildComponentId({
@@ -127,7 +123,7 @@ export class World<
     }
   }
 
-  addSystem(Sys: ValueOf<S>, opt?: SystemOptions<C, S>) {
+  addSystem(Sys: ValueOf<S>, opt?: SystemOptions<this>) {
     const inst: any = new Sys(this, opt);
     this.systems[inst.opt.name as keyof S] = inst;
     return this;
@@ -225,7 +221,7 @@ export class World<
     );
   }
 
-  exportEntity(entity: Entity<World>) {
+  exportEntity(entity: Entity<this>) {
     const components = entity.components.map(compName => {
       const comp = this.componentInstances[compName];
       return {
@@ -302,19 +298,9 @@ export class World<
     }
   }
 
-  /**
-   * query local entities
-   * @param data
-   * @param type
-   * @returns
-   */
-  queryEntities(data: string[], type: keyof World['queryMapping'] = 'id') {
-    return this.queryMapping[type](data);
-  }
-
-  queryEntitiesByTags(tags: string[]): Entity<World<C, S, State>>[] {
+  queryEntitiesByTags(tags: string[]): Entity<this>[] {
     return Object.values(this.entities).reduce(
-      (arr: Entity<World<C, S, State>>[], entity) => {
+      (arr: Entity<this>[], entity) => {
         if (matchTags(tags, entity.opt.tags || [])) {
           arr.push(entity);
         }
@@ -328,11 +314,9 @@ export class World<
     return ids.map(id => this.entities[id]);
   }
 
-  queryEntitiesByComponents(
-    componentNames: string[]
-  ): Entity<World<C, S, State>>[] {
+  queryEntitiesByComponents(componentNames: (keyof C)[]): Entity<this>[] {
     return Object.values(this.entities).reduce(
-      (arr: Entity<World<C, S, State>>[], entity) => {
+      (arr: Entity<this>[], entity) => {
         const res = entity.findComponents(componentNames);
         if (res.filter(a => !!a).length === componentNames.length) {
           arr.push(entity);

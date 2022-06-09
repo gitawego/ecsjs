@@ -1,6 +1,6 @@
 import * as uuid from 'uuid';
 import type { Component } from './Component';
-import { EntityOptions } from './model';
+import { EntityOptions, ValueOf } from './model';
 import { buildComponentId, parseTags } from './utils';
 import { World } from './World';
 export class Entity<W extends World> {
@@ -42,6 +42,15 @@ export class Entity<W extends World> {
     );
   }
 
+  hasParent() {
+    return !!this.getParentId();
+  }
+
+  getParentId() {
+    const parsedTags = parseTags(this.opt.tags || []);
+    return parsedTags.parent;
+  }
+
   moveToParent(entityId: string) {
     const parent = this.world.findEntityById(entityId);
     if (!parent) {
@@ -59,16 +68,21 @@ export class Entity<W extends World> {
     }
   }
 
-  findComponents(names: (keyof W['components'])[]): Component[] {
-    return names.reduce((arr: Component[], name) => {
-      const id = buildComponentId({
-        componentName: name,
-        entityId: this.id,
-      });
-      const comp = this.world.componentInstances[id];
-      arr.push(comp || null);
-      return arr;
-    }, []);
+  findComponents(
+    names: (keyof W['components'])[]
+  ): InstanceType<ValueOf<W['components']>>[] {
+    return names.reduce(
+      (arr: InstanceType<ValueOf<W['components']>>[], name) => {
+        const id = buildComponentId({
+          componentName: name,
+          entityId: this.id,
+        });
+        const comp = this.world.componentInstances[id];
+        arr.push(comp);
+        return arr;
+      },
+      []
+    );
   }
 
   addComponent<T extends Component>({
@@ -99,7 +113,7 @@ export class Entity<W extends World> {
     });
   }
 
-  removeComponent(componentName: string) {
+  removeComponent(componentName: keyof W['components']) {
     return this.world.removeComponentFromEntity({
       componentName,
       entityId: this.id,

@@ -1,18 +1,12 @@
 import { Component } from './Component';
-import { RegisteredSystems, SystemOptions } from './model';
+import { SystemOptions } from './model';
 import { World } from './World';
 
 /**
  * extend this class to create a system
  */
-export abstract class System<
-  W extends World,
-  S extends RegisteredSystems<World> = any
-> {
-  constructor(
-    readonly world: W,
-    readonly opt: SystemOptions<W['components'], S>
-  ) {}
+export abstract class System<W extends World> {
+  constructor(readonly world: W, readonly opt: SystemOptions<W>) {}
 
   abstract update(comps: Component[]): Promise<any>;
   async preUpdate?(): Promise<void>;

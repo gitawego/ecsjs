@@ -3,10 +3,10 @@ import { System } from '../../ecs/System';
 import type { ToDoItemComponent } from '../components/ToDoItemComponent';
 import { ToDoListComponent } from '../components/ToDoListComponent';
 import { live } from '../domHelper';
-import { RenderType, Systems, ToDoWorld } from '../todo.model';
+import { RenderType, ToDoWorld } from '../todo.model';
 
-export class ToDoListSystem extends System<ToDoWorld, Systems> {
-  toDoItemsArchType: ArcheType;
+export class ToDoListSystem extends System<ToDoWorld> {
+  toDoItemsArchType: ArcheType<ToDoWorld>;
 
   constructor(override readonly world: ToDoWorld) {
     super(world, {

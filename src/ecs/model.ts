@@ -7,17 +7,17 @@ import type { SessionStorage } from './storage/SessionStorage';
 import type { System } from './System';
 import type { World } from './World';
 
-export interface EntityOptions<T = any, N = any> {
+export interface EntityOptions<Data = any, ComponentName = any> {
   id?: string;
   tags?: string[];
-  components?: Omit<AddComponentOptions<T, N>, 'entityId'>[];
+  components?: Omit<AddComponentOptions<Data, ComponentName>, 'entityId'>[];
   importData?: boolean;
 }
 
-export interface AddComponentOptions<T = any, N = any> {
-  componentName: N;
+export interface AddComponentOptions<Data = any, ComponentName = any> {
+  componentName: ComponentName;
   entityId: string;
-  data: T;
+  data: Data;
   importData?: boolean;
 }
 
@@ -26,21 +26,18 @@ export interface ComponentOptions<Comp extends string = any> {
   entityId: string;
 }
 
-export interface RemoveComponentOptions {
-  componentName?: string;
+export interface RemoveComponentOptions<W extends World> {
+  componentName?: keyof W['components'];
   componentId?: string;
   entityId: string;
 }
 
-export interface SystemOptions<
-  C extends Record<ComponentSubClass['componentName'], ComponentSubClass>,
-  S extends RegisteredSystems<World> = any
-> extends SystemOrder<S> {
+export interface SystemOptions<W extends World = any> extends SystemOrder<W> {
   name: string;
-  componentNames: (keyof C)[];
+  componentNames: (keyof W['components'])[];
 }
 
-export interface SystemOrder<S extends RegisteredSystems<World> = any> {
+export interface SystemOrder<W extends World = any> {
   /**
    * run before other systems
    */
@@ -52,15 +49,14 @@ export interface SystemOrder<S extends RegisteredSystems<World> = any> {
   /**
    * update before specified system
    */
-  updateBefore?: keyof S;
+  updateBefore?: keyof Parameters<W['addSystems']>[0];
   /**
    * update after specified system
    */
-  updateAfter?: keyof S;
+  updateAfter?: keyof Parameters<W['addSystems']>[0];
 }
 
-export interface SystemGroup<S extends RegisteredSystems<World> = any>
-  extends SystemOrder<S> {
+export interface SystemGroup<W extends World = any> extends SystemOrder<W> {
   name: string;
   systems: string[];
   children: string[];
@@ -107,7 +103,7 @@ export interface ECSEvents<W extends World = any> {
     fromParent: string;
     toParent: string;
   };
-  'component:remove': RemoveComponentOptions;
+  'component:remove': RemoveComponentOptions<W>;
   'component:add': AddComponentOptions;
   'system:error': {
     systemName: string;
@@ -129,10 +125,6 @@ export interface ECSStorage<T = any> extends EventEmitter<ECSStorageEventName> {
   set(id: string, val: T): Promise<any>;
   remove(id: string): Promise<boolean>;
   query(selector: any): Promise<T[]>;
-}
-
-export interface WorldOptions {
-  storage?: WorldStorage;
 }
 
 export interface WorldStorage {
@@ -162,7 +154,9 @@ export interface Storages {
   session: SessionStorage;
 }
 
-export type ComponentSubClass = (new (...args: any[]) => Component) & {
+export type ComponentSubClass = (new (...args: any[]) => InstanceType<
+  typeof Component
+>) & {
   // a concrete constructor of Component<any>
   [K in keyof typeof Component]: typeof Component[K];
 };
@@ -186,9 +180,11 @@ export type RegisteredComponents = Record<
 
 export type ValueOf<T> = T[keyof T];
 
-export interface WorldOptions {
+export interface WorldOptions<State = any> {
   /**
    * for UI
    */
   screen?: HTMLElement;
+  storage?: WorldStorage;
+  state?: State;
 }

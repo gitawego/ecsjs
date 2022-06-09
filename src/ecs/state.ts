@@ -5,9 +5,9 @@ export interface Subscribers<T> {
   key: keyof T;
   callback: Subscriber<T>;
 }
-export function state<T extends object = any>(initialState: Partial<T>) {
+export function state<T extends object = any>(initialState?: Partial<T>) {
   const subs: Subscribers<T>[] = [];
-  const store = new Proxy(initialState, {
+  const store = new Proxy(initialState || ({} as Partial<T>), {
     set(stateVal: T, key: string, value: any) {
       const oldState = { ...stateVal };
       set(stateVal, key, value);

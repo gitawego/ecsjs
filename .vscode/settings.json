@@ -10,14 +10,15 @@
     "typescript"
   ],
   "[typescript]": {
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": true,
-      "source.fixAll": true
-    }
+    "editor.codeActionsOnSave": [
+      "source.organizeImports",
+      "source.fixAll"
+    ]
   },
   "editor.wordWrap": "on",
   "javascript.referencesCodeLens.enabled": true,
   "javascript.referencesCodeLens.showOnAllFunctions": true,
   "typescript.referencesCodeLens.enabled": true,
-  "typescript.referencesCodeLens.showOnAllFunctions": true
+  "typescript.referencesCodeLens.showOnAllFunctions": true,
+  "typescript.tsdk": "./node_modules/typescript/lib/"
 }

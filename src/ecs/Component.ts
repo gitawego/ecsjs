@@ -3,7 +3,7 @@ import { AddComponentOptions } from './model';
 import { buildComponentId } from './utils';
 import { World } from './World';
 
-export class Component<T = any> {
+export class Component<T = any, W extends World = World> {
   static readonly componentName: string;
 
   readonly id: string;
@@ -14,7 +14,7 @@ export class Component<T = any> {
 
   entityId: string;
 
-  constructor(opt: AddComponentOptions<T>, readonly world: World) {
+  constructor(opt: AddComponentOptions<T>, readonly world: W) {
     this.entityId = opt.entityId;
     this.componentName = (this.constructor as any).componentName;
     this.id = buildComponentId({

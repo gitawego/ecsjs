@@ -1,9 +1,9 @@
 import { System } from '../../ecs/System';
 import { RemoveComponent } from '../components/RemoveComponent';
 import { ToDoItemComponent } from '../components/ToDoItemComponent';
-import { Systems, ToDoWorld } from '../todo.model';
+import { ToDoWorld } from '../todo.model';
 
-export class RemoveSystem extends System<ToDoWorld, Systems> {
+export class RemoveSystem extends System<ToDoWorld> {
   constructor(override readonly world: ToDoWorld) {
     super(world, {
       componentNames: ['toDoItem', 'remove'],

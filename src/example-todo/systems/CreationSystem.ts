@@ -1,9 +1,9 @@
 import { System } from '../../ecs/System';
 import { CreateComponent } from '../components/CreateComponent';
 import { toDoItemEntity } from '../entities';
-import { Systems, ToDoWorld } from '../todo.model';
+import { ToDoWorld } from '../todo.model';
 
-export class CreationSystem extends System<ToDoWorld, Systems> {
+export class CreationSystem extends System<ToDoWorld> {
   constructor(override readonly world: ToDoWorld) {
     super(world, {
       componentNames: ['create'],
